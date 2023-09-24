@@ -1,7 +1,8 @@
 ---
 layout: default
-title: Home
 permalink: /
+title: Home
 ---
+# Getting Started
 
-Learning stuffs coming soon!!!!!!!!!!!!
+- [Neural Networks](neural-networks/)

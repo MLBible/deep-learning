@@ -75,7 +75,7 @@ where $$w = (w_0, \ldots, w_{M-1})^T$$ and $$\phi = (\phi_0, \ldots, \phi_{M-1})
 
 By using nonlinear basis functions, we allow the function $$y(\mathbf{x}, \mathbf{w})$$ to be a nonlinear function of the input vector $$x$$. Functions of the form (1) are called linear models; however, because this function is linear in $$w$$, it is this linearity in the parameters that will greatly simplify the analysis of this class of models.
 
-The example of polynomial regression considered <a href="https://mlbible.github.io/classical-ml/multiple-linear-regression/#introduction" target="_blank">multiple linear regression</a> is a particular example of this model in which there is a single input variable $$x$$, and the basis functions take the form of powers of $$x$$ so that $$\phi_j (x) = x^j$$. One limitation of polynomial basis functions is that they are global functions of the input variable, so that changes in one region of input space affect all other regions. This can be resolved by dividing the input space up into regions and fitting a different polynomial in each region, leading to spline functions (Hastie et al., 2001).
+The example of polynomial regression considered in <a href="https://mlbible.github.io/classical-ml/multiple-linear-regression/#introduction" target="_blank">multiple linear regression</a> is a particular example of this model in which there is a single input variable $$x$$, and the basis functions take the form of powers of $$x$$ so that $$\phi_j (x) = x^j$$. One limitation of polynomial basis functions is that they are global functions of the input variable, so that changes in one region of input space affect all other regions. This can be resolved by dividing the input space up into regions and fitting a different polynomial in each region, leading to spline functions (Hastie et al., 2001).
 
 
 # Feedforward Neural Networks or Multilayer Perceptron
@@ -125,4 +125,41 @@ The idea behind neural networks is that many neurons can be joined together by c
 It is common to describe the structure of a neural network as a graph whose nodes are the neurons and each (directed) edge in the graph links the output of some neuron to the input of another neuron. We will restrict our attention to feedforward network structures in which the underlying graph does not contain cycles. This means there are no loops in the network - information is always fed forward, never fed back.
 
 Let $$V_0, V_1, \ldots, V_{T}$$ be the layers of a neural network where $$V_0$$ is the input layer.
-Layers $$V_1, \ldots, V_{T-1}$$ are often called hidden layers. The top layer, $$V_T$$, is called the output layer. In simple prediction problems, the output layer contains a single neuron whose output is the output of the network. We refer to $$T$$ as the number of layers in the network (excluding $$V_0$$), or the “depth” of the network. The size of the network is $$\vert V \vert$$. The “width” of the network is $$\max_t \vert V_t \vert$$. 
+Layers $$V_1, \ldots, V_{T-1}$$ are often called hidden layers. The top layer, $$V_T$$, is called the output layer. In simple prediction problems, the output layer contains a single neuron whose output is the output of the network. We refer to $$T$$ as the number of layers in the network (excluding $$V_0$$), or the “depth” of the network. The size of the network is $$ \vert  V  \vert $$. The “width” of the network is $$\max_t  \vert  V_t  \vert $$. 
+
+
+# MLE
+
+We shall assume that, given the value of $$\mathbf{x}$$, the corresponding value of target $$t$$ has a Gaussian distribution with a mean equal to the value $$y_k(\mathbf{x}, \mathbf{w})$$. For the sake of simplicity, we drop the subscript $$k$$ for the time being. Thus, we have
+
+$$
+p(t \vert x, w, \beta) = \mathcal{N}(t \vert y(\mathbf{x}, \mathbf{w}), \beta^{-1})
+$$
+
+where we have defined a precision parameter $$\beta$$ corresponding to the inverse variance (the $$\Sigma$$ matrix) of the distribution. Note that the $$\beta$$'s here are not the biases. The biases are included in the $$\mathbf{w}$$ vector itself. We now use the training data to determine the values of the unknown parameters $$\mathbf{w}$$ and $$\beta$$ by maximum likelihood. If the data are assumed to be drawn independently, then the likelihood function is given by
+
+$$
+p(t \vert x, w, \beta) = \prod_{n=1}^{N} \mathcal{N}(t_n \vert y(x_n, w), \beta^{-1}). \tag{3}
+$$
+
+It is convenient to maximize the logarithm of the likelihood function which takes the form
+
+$$
+\ln p(t \vert x, w, \beta) = -\frac{\beta}{2} \sum_{n=1}^{N} \left\{y(x_n, w) - t_n\right\}^2 + \frac{N}{2} \ln \beta - \frac{N}{2} \ln(2\pi). \tag{4}
+$$
+
+Consider first the determination of the maximum likelihood solution for the coefficients $$w$$, which will be denoted by $$w_{\text{ML}}$$. These are determined by maximizing (4) with respect to $$w$$. For this purpose, we can omit the last two terms on the right-hand side of (4) because they do not depend on $$w$$. Also, we note that scaling the log likelihood by a positive constant coefficient does not alter the location of the maximum with respect to $$w$$, and so we can replace the coefficient $$\beta/2$$ with $$1/2$$. Finally, instead of maximizing the log likelihood, we can equivalently minimize the negative log likelihood. 
+
+<blockquote style="background-color: #FFFFE0; padding: 10px;">
+<b>
+We therefore see that maximizing likelihood is equivalent, so far as determining $w$ is concerned, to minimizing the sum-of-squares error function. Thus the sum-of-squares error function has arisen as a consequence of maximizing likelihood under the assumption of a Gaussian noise distribution.
+</b>
+</blockquote>
+
+We can also use maximum likelihood to determine the precision parameter $$\beta$$ of the Gaussian conditional distribution. Maximizing (4) with respect to $$\beta$$ gives
+
+$$
+\frac{1}{\beta_{\text{ML}}} = \frac{1}{N} \sum_{n=1}^{N} \left\{y(x_n, w_{\text{ML}}) - t_n\right\}^2
+$$
+
+Again, we can first determine the parameter vector $$w_{\text{ML}}$$ governing the mean and subsequently use this to find the precision $$\beta_{\text{ML}}$$. Having determined the parameters $$w$$ and $$\beta$$, we can now make predictions for new values of $$x$$.
